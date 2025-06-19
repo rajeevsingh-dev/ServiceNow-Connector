@@ -139,20 +139,10 @@ class ServiceNowUploader:
             return False
     
     def upload_attachment(self, table_name, table_sys_id, file_path):
-        """Upload a file as an attachment
-        
-        Args:
-            table_name: Name of the table (e.g., kb_knowledge)
-            table_sys_id: sys_id of the record
-            file_path: Path to the file to upload
-            
-        Returns:
-            sys_id of created attachment or None if failed
-        """
+        """Upload a file as an attachment, with force-upload fallback logic."""
         file_name = os.path.basename(file_path)
-        
+        url = f"{INSTANCE_URL}/api/now/attachment/file"
         try:
-            url = f"{INSTANCE_URL}/api/now/attachment/file"
             print(f"Uploading attachment to: {url}", flush=True)
             with open(file_path, 'rb') as file_data:
                 files = {
@@ -162,8 +152,7 @@ class ServiceNowUploader:
                     'table_name': table_name,
                     'table_sys_id': table_sys_id
                 }
-                print(f"Data being sent: table_name={table_name}, table_sys_id={table_sys_id}", flush=True)
-                print("Sending attachment request...", flush=True)
+                print(f"[Primary] Sending multipart/form-data...", flush=True)
                 response = requests.post(
                     url,
                     auth=self.auth,
@@ -173,12 +162,41 @@ class ServiceNowUploader:
             if response.status_code == 201:
                 result = response.json()
                 attachment_id = result['result']['sys_id']
-                print(f"Uploaded attachment: {file_name} (ID: {attachment_id})", flush=True)
+                print(f"[Primary] Uploaded attachment: {file_name} (ID: {attachment_id})", flush=True)
                 return attachment_id
             else:
-                print(f"Error uploading attachment: HTTP {response.status_code}", flush=True)
-                print(f"Response: {response.text}", flush=True)
-                return None
+                print(f"[Primary] Error: HTTP {response.status_code}", flush=True)
+                print(f"[Primary] Response: {response.text}", flush=True)
+                print("[Fallback] Trying sys_attachment base64 upload...", flush=True)
+                # Fallback: sys_attachment base64 method
+                url2 = f"{INSTANCE_URL}/api/now/table/sys_attachment"
+                with open(file_path, 'rb') as file_data:
+                    file_content = file_data.read()
+                    file_base64 = base64.b64encode(file_content).decode('utf-8')
+                data2 = {
+                    "table_name": table_name,
+                    "table_sys_id": table_sys_id,
+                    "file_name": file_name,
+                    "content_type": "application/pdf",
+                    "size_bytes": len(file_content),
+                    "file": file_base64
+                }
+                response2 = requests.post(
+                    url2,
+                    auth=self.auth,
+                    headers=self.headers,
+                    json=data2
+                )
+                if response2.status_code == 201:
+                    result2 = response2.json()
+                    attachment_id2 = result2['result']['sys_id']
+                    print(f"[Fallback] Uploaded attachment: {file_name} (ID: {attachment_id2})", flush=True)
+                    return attachment_id2
+                else:
+                    print(f"[Fallback] Error: HTTP {response2.status_code}", flush=True)
+                    print(f"[Fallback] Response: {response2.text}", flush=True)
+                    print("[Force-Upload] All known upload methods failed.", flush=True)
+                    return None
         except Exception as e:
             print(f"Exception uploading attachment: {e}", flush=True)
             return None

@@ -18,6 +18,7 @@ ENV/
 .env
 *.env
 .env.*
+!.env.example  # Keep the example environment file in the repository
 
 # IDE specific files
 .idea/

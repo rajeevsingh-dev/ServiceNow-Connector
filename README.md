@@ -11,38 +11,19 @@ This sample demonstrates how to:
 
 ## ServiceNow Integration Approaches
 
-There are several ways to connect and integrate with ServiceNow:
+ServiceNow offers several integration methods for different use cases:
 
-1. **REST API** (used in this project)
-   - Simple HTTP requests using basic authentication
-   - Best for straightforward operations and quick implementations
-   - Allows CRUD operations on ServiceNow tables and attachments
+1. **REST API** (used in this project) - [Official Docs](https://developer.servicenow.com/dev.do#!/reference/api/tokyo/rest/c_TableAPI)  
+   Standard HTTP-based API for CRUD operations on ServiceNow records. Ideal for straightforward integrations and widely supported across programming languages. Requires minimal setup but proper authentication.
 
-2. **SOAP Web Services**
-   - XML-based protocol for more complex integrations
-   - Good for enterprise integration scenarios
-   - Requires WSDL understanding but provides strong typing
+2. **MID Server** - [Official Docs](https://docs.servicenow.com/bundle/tokyo-servicenow-platform/page/product/mid-server/concept/mid-server-landing.html)  
+   A Java application that runs on a server in your network to facilitate secure communications between ServiceNow and internal systems. Useful for accessing resources behind firewalls or when ServiceNow needs to interact with on-premises systems.
 
-3. **ServiceNow API Client Libraries**
-   - Official libraries for languages like JavaScript, Java, etc.
-   - Streamlined API interactions with built-in authentication handling
-   - Not available for all languages
+3. **Integration Hub** - [Official Docs](https://docs.servicenow.com/bundle/tokyo-servicenow-platform/page/administer/integrationhub/concept/integrationhub.html)  
+   A no-code/low-code platform for building workflows that integrate with third-party systems. Features pre-built "spokes" (connectors) for common applications and services, allowing complex integrations without extensive coding.
 
-4. **MID Server**
-   - For secure integrations between ServiceNow and internal systems
-   - Runs as an agent within your network
-   - Handles data flow between ServiceNow and internal resources
-
-5. **Integration Hub**
-   - No-code/low-code integration platform from ServiceNow
-   - Pre-built connectors for many third-party systems
-   - Requires additional licensing
-
-6. **Microsoft Logic Apps with ServiceNow Connector**
-   - No-code/low-code integration via [Microsoft Logic Apps ServiceNow Connector](https://learn.microsoft.com/en-us/connectors/service-now/)
-   - Visual workflow designer for building automated processes
-   - Easy integration with other Microsoft and third-party services
-   - Built-in connectors for common ServiceNow operations
+4. **Microsoft Logic Apps with ServiceNow Connector** - [Microsoft Docs](https://learn.microsoft.com/en-us/connectors/service-now/)  
+   Microsoft's cloud-based integration service that connects ServiceNow with other Azure services and third-party applications. Provides a visual designer for creating automated workflows with built-in connectors, triggers, and actions specific to ServiceNow.
 
 ### Our Implementation Approach
 
@@ -71,7 +52,17 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configure Environment
-Create a `.env` file with your ServiceNow credentials:
+Copy the `.env.example` file to `.env` and update with your ServiceNow credentials:
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit the file with your editor
+# For Windows: notepad .env
+# For macOS/Linux: nano .env
+```
+
+Your `.env` file should contain:
 ```
 SERVICENOW_INSTANCE_URL=https://your-instance.service-now.com
 SERVICENOW_USERNAME=your-username

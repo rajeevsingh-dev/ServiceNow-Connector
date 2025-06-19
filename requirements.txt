@@ -1,0 +1,13 @@
+# ServiceNow PDF Document Manager Requirements
+
+# Core HTTP libraries
+requests>=2.31.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# PDF processing
+PyPDF2>=3.0.0
+
+# Async support for PDF viewer
+aiohttp>=3.9.0
